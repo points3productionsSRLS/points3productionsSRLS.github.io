@@ -600,7 +600,7 @@ const fd=d=>d?String(d).split('-').reverse().join('/'):'';
 const iso=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 const today=()=>iso(new Date());
 const nk=s=>String(s||'').trim().toLowerCase().replace(/’/g,"'");
-const C={'francesco torre':['#f2f2f2','#111'],'alessandra polizzi':['#2e9e4f','#fff'],'giorgia cordaro':['#f2c200','#1d1d1b'],'giuseppe ciulla':['#f57c00','#fff'],'giorgia culcasi':['#7b3fb5','#fff'],'veronica':['#e91e8c','#fff'],'veronica urso':['#e91e8c','#fff'],'francesco parisi':['#1e5fd6','#fff'],'michael c. allen':['#111','#fff'],"alessandro d'india":['#7a4a2b','#fff'],'tancredi bettio':['#fff','#1d1d1b'],'giuseppe calandra':['#d9c7a3','#1d1d1b']};
+const C={'francesco torre':['#f2f2f2','#111'],'alessandra polizzi':['#2e9e4f','#fff'],'giorgia cordaro':['#f2c200','#1d1d1b'],'giuseppe ciulla':['#f57c00','#fff'],'giorgia culcasi':['#7b3fb5','#fff'],'veronica':['#e91e8c','#fff'],'veronica urso':['#e91e8c','#fff'],'francesco parisi':['#1e5fd6','#fff'],'michael c. allen':['#111','#fff'],"alessandro d'india":['#7a4a2b','#fff'],'tancredi bettio':['#fc8eac','#1d1d1b'],'giuseppe calandra':['#d9c7a3','#1d1d1b']};
 const hx=h=>{h=String(h).replace('#','');if(h.length==3)h=h.split('').map(c=>c+c).join('');return [0,2,4].map(i=>parseInt(h.substr(i,2),16))};
 const mix=(h,t,p)=>'#'+hx(h).map(c=>Math.round(c+(t-c)*p).toString(16).padStart(2,'0')).join('');
 const txt=h=>{const [r,g,b]=hx(h);return (r*299+g*587+b*114)/1000>150?'#1d1d1b':'#fff'};
