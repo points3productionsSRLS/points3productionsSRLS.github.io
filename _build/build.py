@@ -45,7 +45,16 @@ assert h.count('<meta charset="utf-8">') == 1
 h = h.replace('<meta charset="utf-8">', '<meta charset="utf-8">' + head, 1)
 
 # install prompt + service worker (public build only)
-inst = r'''<style>
+inst = r'''<script>
+/* contatore anonimo aperture app 3PP (nessun cookie, nessun dato personale) */
+(function(){try{
+ if(sessionStorage.getItem('3pp_seen'))return;sessionStorage.setItem('3pp_seen','1');
+ const d=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome'}).format(new Date()).replace(/-/g,'');
+ const B='https://abacus.jasoncameron.dev/hit/3pp-srls-app/';
+ [B+'totale',B+'g-'+d].forEach(u=>fetch(u,{mode:'cors',keepalive:true}).catch(()=>{}));
+}catch(e){}})();
+</script>
+<style>
 .x-inst{position:fixed;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom,0px));z-index:60;display:flex;align-items:center;gap:12px;padding:12px 14px;background:#111;border:1px solid #ffffff2a;border-radius:16px;box-shadow:0 10px 40px #000a;font:500 13px var(--fb,'Work Sans',sans-serif);color:#fff}
 .x-inst img{width:36px;height:36px;border-radius:9px}.x-inst b{display:block;font-size:13px}.x-inst span{color:#aaa;font-size:12px}
 .x-inst .go{margin-left:auto;background:#fff;color:#000;border:0;border-radius:999px;padding:8px 14px;font:600 11px var(--fh,'Work Sans',sans-serif);letter-spacing:.12em;text-transform:uppercase}

@@ -1546,6 +1546,15 @@ if(STANDALONE)OP=false;
 
 </script><script>(function(){function f(){var t=document.querySelector('.x-top');var x=document.getElementById('x');var h=(t&&x&&!x.hidden)?Math.round(t.getBoundingClientRect().height):0;document.documentElement.style.setProperty('--toph',h+'px')}f();window.addEventListener('resize',f);window.addEventListener('hashchange',function(){setTimeout(f,50)});try{var t=document.querySelector('.x-top');if(t&&window.ResizeObserver)new ResizeObserver(f).observe(t);var x=document.getElementById('x');if(x&&window.MutationObserver)new MutationObserver(f).observe(x,{attributes:true,attributeFilter:['hidden']})}catch(e){}})();</script>
 </body></html>
+<script>
+/* contatore anonimo aperture app 3PP (nessun cookie, nessun dato personale) */
+(function(){try{
+ if(sessionStorage.getItem('3pp_seen'))return;sessionStorage.setItem('3pp_seen','1');
+ const d=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome'}).format(new Date()).replace(/-/g,'');
+ const B='https://abacus.jasoncameron.dev/hit/3pp-srls-app/';
+ [B+'totale',B+'g-'+d].forEach(u=>fetch(u,{mode:'cors',keepalive:true}).catch(()=>{}));
+}catch(e){}})();
+</script>
 <style>
 .x-inst{position:fixed;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom,0px));z-index:60;display:flex;align-items:center;gap:12px;padding:12px 14px;background:#111;border:1px solid #ffffff2a;border-radius:16px;box-shadow:0 10px 40px #000a;font:500 13px var(--fb,'Work Sans',sans-serif);color:#fff}
 .x-inst img{width:36px;height:36px;border-radius:9px}.x-inst b{display:block;font-size:13px}.x-inst span{color:#aaa;font-size:12px}
