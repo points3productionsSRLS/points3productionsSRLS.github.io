@@ -473,6 +473,9 @@ main.cmp #srch{padding:4px 8px;font-size:12px;margin-bottom:6px!important}
 .o-btn.g{background:transparent;color:#f2f2f2;border:1px solid #2a2a30}
 .o-in2{width:100%;background:#0e0e10;border:1px solid #2a2a30;border-radius:10px;padding:10px 12px;color:#f2f2f2;font:14px 'Work Sans',sans-serif;margin:4px 0 8px}
 .o-note{color:#8a8a8a;font-size:12px}
+.o-app{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:#2a2a30;border:1px solid #2a2a30;border-radius:12px;overflow:hidden}.o-app div{background:#111114;padding:12px 14px}.o-app b{display:block;font:600 28px/1 'Work Sans',sans-serif;color:#fff;font-variant-numeric:tabular-nums}.o-app span{font-size:11.5px;color:#a8a8a8}
+.o-bars{display:flex;align-items:flex-end;gap:4px;height:70px;margin:14px 0 4px}.o-bars i{flex:1;min-width:0;background:#fff;border-radius:2px 2px 0 0;min-height:2px;opacity:.9}.o-bars i.z{background:#2a2a30}.o-bl{display:flex;justify-content:space-between;font-size:10.5px;color:#8a8a8a}
+@media(max-width:560px){.o-app{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .o-gate{max-width:520px;margin:60px auto;text-align:center;padding:0 20px}
 .o-gate .x-mark{width:80px;height:80px;margin-bottom:18px}
 details.o-det summary{cursor:pointer;color:#ffffff;font-size:13px;margin-top:6px}
@@ -1226,7 +1229,7 @@ const IC={
 
 /* ---------- stato ---------- */
 let view='home',cat='all',q='',cart=LS.get('cart',{}),days=LS.get('days',1),form=LS.get('form',{});
-let OP=null,USER=null,DBX=null,MCP=null,oTab='dash',REQ=[],NEWS=[],GML=null,GMLerr=null;
+let OP=null,USER=null,DBX=null,MCP=null,oTab='dash',REQ=[],NEWS=[],APPST=null,GML=null,GMLerr=null;
 const ITEMS={};CATS.forEach(c=>c.G.forEach(([g,its])=>its.forEach(([n,d,p,u])=>{const k=c.id+'|'+n;ITEMS[k]={k,c:c.id,ct:c.t,crew:!!c.crew,g,n,d,p,u:u||'g'}})));
 Object.keys(cart).forEach(k=>{if(!ITEMS[k])delete cart[k]});
 const saveCart=()=>{LS.set('cart',cart);LS.set('days',days)};
@@ -1493,10 +1496,18 @@ function oDash(){const H=HD(),t=td(),w=addD(7),m=addD(30);
  const name=USER&&USER.__name?USER.__name.split(' ')[0]:'';
  return `<div class="x-eye" style="color:#ffffff">${new Date().toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'})}</div><h2 style="font:600 30px 'Oswald',sans-serif;text-transform:uppercase;margin:6px 0 0">Ciao${name?' '+E(name):''} 👋</h2>
  <div class="o-kpi"><button onclick="x3go('area-richieste')"><b>${nr}</b><span>Richieste da gestire</span></button><button onclick="x3go('calendario')"><b>${ev7.length}</b><span>Impegni nei prossimi 7 giorni</span></button><button onclick="x3go('preventivi')"><b>${pv.length}</b><span>Preventivi aperti</span></button><button onclick="x3go('bandi')"><b>${bd.length}</b><span>Bandi in scadenza (30 gg)</span></button></div>
+ ${oApp()}
  <div class="o-box"><h3>Prossimi impegni</h3>${ev.slice(0,6).map(e=>`<div class="o-li" style="border-left:4px solid ${typeof evBg=='function'?E(evBg(e)):'transparent'};padding-left:10px">${dBox(e.data)}<div class="m"><b>${E(e.titolo)}</b><span>${[e.ora,e.tipo,e.luogo].filter(Boolean).map(E).join(' · ')}</span>${e.chi&&typeof pill=='function'?`<div style="margin-top:4px">${pill(e.chi)}</div>`:''}</div></div>`).join('')||'<p class="o-note">Nessun impegno in calendario.</p>'}<p style="margin:8px 0 0"><a class="o-btn g" href="#calendario">Apri calendario</a></p></div>
  <div class="o-box"><h3>Ultime richieste</h3>${REQ.slice(0,4).map(reqRow).join('')||'<p class="o-note">Nessuna richiesta dall\'app per ora.</p>'}${GML&&GML.length?`<p class="o-note">+ ${GML.length} richieste arrivate via email</p>`:''}</div>
  <div class="o-box"><h3>Aggiornamenti</h3>${NEWS.slice(0,3).map(newsRow).join('')||'<p class="o-note">Qui compaiono gli aggiornamenti che facciamo insieme su Claude.</p>'}</div>
  ${bd.length?`<div class="o-box"><h3>Bandi in scadenza</h3>${bd.map(b=>`<div class="o-li">${dBox(b.scadd)}<div class="m"><b>${E(b.nome)}</b><span>${E(b.av||'')} ${b.resp?'· '+E(b.resp):''}</span></div></div>`).join('')}</div>`:''}`}
+function oApp(){const A=APPST,G=(A&&A.giorni)||{},nf=n=>Number(n||0).toLocaleString('it-IT');
+ const sum=k=>{let s=0;for(let i=1;i<=k;i++)s+=+G[addD(-i)]||0;return s};
+ const dd=[];for(let i=14;i>=1;i--){const k=addD(-i);dd.push([k,+G[k]||0])}const mx=Math.max(1,...dd.map(x=>x[1]));
+ const agg=A&&A.agg?new Date(A.agg).toLocaleString('it-IT',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'';
+ return `<div class="o-box"><h3>App 3PP · aperture</h3>${A?`<div class="o-app"><div><b>${nf(A.tot)}</b><span>Totale dal 20 nov 2026</span></div><div><b>${nf(G[addD(-1)])}</b><span>Ieri</span></div><div><b>${nf(sum(7))}</b><span>Ultimi 7 giorni</span></div><div><b>${nf(sum(30))}</b><span>Ultimi 30 giorni</span></div></div>
+ <div class="o-bars" title="Aperture al giorno, ultimi 14 giorni">${dd.map(([k,v])=>`<i class="${v?'':'z'}" style="height:${Math.round(v/mx*100)}%" title="${k.split('-').reverse().join('/')}: ${v}"></i>`).join('')}</div><div class="o-bl"><span>${dd[0][0].split('-').reverse().slice(0,2).join('/')}</span><span>ieri</span></div>`:'<p class="o-note">Il contatore è attivo da stasera: i primi numeri compaiono qui con l\'aggiornamento di domattina.</p>'}
+ <p class="o-note" style="margin:10px 0 0">Conta ogni apertura del link pubblico, una per visita, in forma anonima (le pagine ricaricate nella stessa visita non contano due volte).${agg?' Aggiornato il '+E(agg)+'.':''} <a href="https://abacus.jasoncameron.dev/get/3pp-srls-app/totale" target="_blank" rel="noopener" style="color:#fff">Totale in tempo reale</a></p></div>`}
 const RST=['Nuova','In lavorazione','Preventivo inviato','Accettata','Persa'];
 function reqRow(r){return `<div class="o-li">${dBox(r._t?new Date(r._t).toISOString().slice(0,10):'')}<div class="m"><b>${E(r.nome)}${r.az?' · '+E(r.az):''}</b><span>${E(r.num||'')} · ${E(r.tipo||'')} · ${eu(r.imp||0)} + IVA</span></div><span class="o-pill ${r.stato=='Nuova'?'new':''}">${E(r.stato||'')}</span></div>`}
 function oReq(){const gm=GMLerr?`<p class="o-note">${E(GMLerr)}</p>`:GML===null?'<p class="o-note">Carico da Gmail…</p>':GML.length?GML.map(t=>{const m=(t.messages||[])[0]||{};return `<div class="o-li"><div class="d">✉︎</div><div class="m"><b>${E(m.subject||'')}</b><span>${E(m.sender||'')} · ${E(m.date?new Date(m.date).toLocaleString('it-IT'):'')}</span><div class="o-note">${m.snippet||''}</div></div><a class="o-btn g" href="${E(t.viewUrl||'#')}" target="_blank" rel="noopener">Apri</a></div>`}).join(''):'<p class="o-note">Nessuna email di richiesta.</p>';
@@ -1535,6 +1546,7 @@ if(STANDALONE)OP=false;
  if(OP&&!location.hash.slice(1))go('hub');
  if(OP&&DBX){
   DBX.collection('richieste').onSnapshot(s=>{REQ=s.docs.map(d=>({...d.data(),id:d.id})).sort((a,b)=>(b._t||0)-(a._t||0));if(!$('#ops').hidden&&oTab!='hub')drawOps()},()=>{});
+  DBX.collection('statsapp').onSnapshot(s=>{const d=s.docs.find(x=>x.id=='aperture');APPST=d?d.data():null;if(!$('#ops').hidden&&oTab!='hub')drawOps()},()=>{});
   DBX.collection('news').onSnapshot(s=>{NEWS=s.docs.map(d=>({...d.data(),id:d.id})).sort((a,b)=>(b._t||0)-(a._t||0));if(!$('#ops').hidden&&oTab!='hub')drawOps()},()=>{});
   try{MCP=await claude.use('mcp');if(MCP){MCP.watchTool('Gmail','search_threads',{query:'subject:"Richiesta preventivo 3PP" newer_than:90d',pageSize:20,view:'THREAD_VIEW_SUMMARY'},ev=>{
    if(ev.type=='data'){let p=ev.result&&ev.result.payload;if(typeof p=='string'){try{p=JSON.parse(p)}catch(e){p={}}}GML=(p&&p.threads)||[];GMLerr=null}
