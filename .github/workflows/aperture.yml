@@ -1,0 +1,70 @@
+# Copia i contatori anonimi delle aperture dell'app (Abacus) in stats/aperture.json,
+# così l'hub li legge dal repository senza dover raggiungere abacus.
+name: Statistiche aperture app
+
+on:
+  schedule:
+    # UTC: 06:20, 12:20, 18:20, 00:20 ora italiana (lontano dalla pubblicazione delle 03:37)
+    - cron: '20 5,11,17,23 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: aperture
+  cancel-in-progress: false
+
+jobs:
+  aggiorna:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Leggi i contatori da Abacus
+        run: |
+          node <<'EOF'
+          const fs = require('fs');
+          const F = 'stats/aperture.json';
+          const B = 'https://abacus.jasoncameron.dev/get/3pp-srls-app/';
+          let old = {};
+          try { old = JSON.parse(fs.readFileSync(F, 'utf8')); } catch (e) {}
+
+          async function get(key) {
+            for (let i = 1; i <= 3; i++) {
+              try {
+                const r = await fetch(B + key, { signal: AbortSignal.timeout(15000) });
+                if (r.status === 404) return 0;          // chiave non ancora creata
+                if (r.ok) { const j = await r.json(); return Number(j.value) || 0; }
+                console.log(key, 'HTTP', r.status, 'tentativo', i);
+              } catch (e) { console.log(key, 'errore', e.message, 'tentativo', i); }
+              await new Promise(s => setTimeout(s, 5000 * i));
+            }
+            throw new Error('Abacus non risponde per ' + key);
+          }
+
+          const rome = d => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Rome' }).format(d);
+          (async () => {
+            const tot = await get('totale');
+            const giorni = { ...(old.giorni || {}) };
+            for (let i = 7; i >= 0; i--) {
+              const k = rome(new Date(Date.now() - i * 86400000)); // AAAA-MM-GG
+              giorni[k] = await get('g-' + k.replace(/-/g, ''));
+            }
+            const changed = tot !== old.tot || JSON.stringify(giorni) !== JSON.stringify(old.giorni || {});
+            if (!changed) { console.log('Nessuna novità, tot =', tot); return; }
+            fs.mkdirSync('stats', { recursive: true });
+            fs.writeFileSync(F, JSON.stringify({ tot, giorni, agg: new Date().toISOString() }, null, 1) + '\n');
+            console.log('Aggiornato: tot =', tot, giorni);
+          })().catch(e => { console.error(e.message); process.exit(1); });
+          EOF
+
+      - name: Salva nel repository
+        run: |
+          git add stats/aperture.json
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name "3 Points Productions"
+          git config user.email "points3productions@gmail.com"
+          git commit -m "Statistiche aperture app $(TZ=Europe/Rome date +%F' '%H:%M)"
+          for i in 1 2 3; do git pull --rebase -q origin main && git push && exit 0; sleep 10; done
+          exit 1
