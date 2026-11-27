@@ -52,7 +52,9 @@ jobs:
               giorni[k] = await get('g-' + k.replace(/-/g, ''));
             }
             const changed = tot !== old.tot || JSON.stringify(giorni) !== JSON.stringify(old.giorni || {});
-            if (!changed) { console.log('Nessuna novità, tot =', tot); return; }
+            // senza novità riscrive solo una volta al giorno, per segnare che la raccolta funziona
+            const fresh = old.agg && Date.now() - Date.parse(old.agg) < 20 * 3600000;
+            if (!changed && fresh) { console.log('Nessuna novità, tot =', tot); return; }
             fs.mkdirSync('stats', { recursive: true });
             fs.writeFileSync(F, JSON.stringify({ tot, giorni, agg: new Date().toISOString() }, null, 1) + '\n');
             console.log('Aggiornato: tot =', tot, giorni);
